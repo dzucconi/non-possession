@@ -1,32 +1,52 @@
+import uniq from 'lodash.uniq';
+import params from './lib/params';
+import difference from './lib/difference';
+import toSentence from './lib/to_sentence';
+
+const PARAMS = params({
+  phrase: 'all the letters of the alphabet',
+});
+
 const DOM = {
   app: document.getElementById('app'),
 };
 
 const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
 
-const uniq = xs =>
-  [...new Set(xs)];
-
-const difference = (a, b) =>
-  a.filter(x => b.indexOf(x) < 0);
-
 const detect = x => {
-  const target = uniq(x.toLowerCase().replace(' ', '').split(''));
+  const target = uniq(x.toString().toLowerCase().replace(' ', '').split(''));
   return difference(alphabet, target);
 };
 
-const toSentence = xs =>
-  xs.join(', ').replace(/,\s([^,]+)$/, ', and $1');
+const redirect = x =>
+  window.location = `${window.location.pathname}?phrase=${encodeURIComponent(x)}`;
 
 export default () => {
   if (window.location.search === '') {
-    window.location = `${window.location.pathname}?phrase=all%20the%20letters%20of%20the%20alphabet`;
+    return redirect(PARAMS.phrase);
   }
 
-  const phrase = decodeURIComponent(window.location.search.split('phrase=').pop()) || 'all the letters of the alphabet';
+  const phrase = PARAMS.phrase || '&hellip;';
   const missing = toSentence(detect(phrase));
 
-  DOM.app.innerHTML = `
-    The phrase <span>“The phrase “${phrase}” contains every letter in the alphabet except for ${missing}.”</span> contains every letter in the alphabet.
+  DOM.app.innerHTML = missing.length === 0 ? `
+    The phrase
+    <span>“<span id='input' contenteditable>${phrase}</span>”</span>
+    contains every letter in the alphabet.
+  ` :
+  `
+    The phrase
+    <span>“The phrase “<span id='input' contenteditable>${phrase}</span>”
+    contains every letter in the alphabet except for ${missing}.”</span>
+    contains every letter in the alphabet.
   `;
+
+  DOM.input = document.getElementById('input');
+
+  DOM.input.addEventListener('keydown', e => {
+    if (e.which === 13) {
+      e.preventDefault();
+      return redirect(DOM.input.innerHTML);
+    }
+  });
 };

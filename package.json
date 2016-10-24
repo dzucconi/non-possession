@@ -31,5 +31,10 @@
     "s3-cli": "^0.13.0",
     "should": "^11.1.0",
     "uglify-js-brunch": "^2.0.0"
+  },
+  "dependencies": {
+    "lodash.defaults": "^4.2.0",
+    "lodash.uniq": "^4.5.0",
+    "qs": "^6.3.0"
   }
 }
