@@ -43,10 +43,15 @@ export default () => {
 
   DOM.input = document.getElementById('input');
 
+  DOM.input.addEventListener('paste', e => {
+    e.preventDefault();
+    DOM.input.innerText = e.clipboardData.getData('text/plain');
+  });
+
   DOM.input.addEventListener('keydown', e => {
     if (e.which === 13) {
       e.preventDefault();
-      return redirect(DOM.input.innerHTML);
+      return redirect(DOM.input.innerText);
     }
   });
 };
